@@ -33,8 +33,7 @@ private:
 
     std::map<std::string, std::vector<std::string> > _map_kin_chains_joints;
 
-    RTT::InputPort<sensor_msgs::JointState> _joint_state_port;
-    RTT::OutputPort<sensor_msgs::JointState> _joint_zero_port;
+    RTT::InputPort<sensor_msgs::JointState> _joint_state_desired_port;
 
     std::map<std::string, boost::shared_ptr<RTT::InputPort<rstrt::robot::JointState> > > _kinematic_chains_feedback_ports;
     std::map<std::string, rstrt::robot::JointState> _kinematic_chains_joint_state_map;

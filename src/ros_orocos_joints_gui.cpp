@@ -17,8 +17,7 @@ ros_orocos_joints_gui_server::ros_orocos_joints_gui_server(std::string const & n
 
 bool ros_orocos_joints_gui_server::configureHook()
 {
-    this->addPort(_joint_state_port).doc("Joint State from ROS gui");
-    this->addPort(_joint_zero_port).doc("Joint zeros for ROS gui");
+    this->addPort(_joint_state_desired_port).doc("Joint State desired from ROS gui");
 
     std::map<std::string, std::vector<std::string> >::iterator it;
     for(it = _map_kin_chains_joints.begin(); it != _map_kin_chains_joints.end(); it++)
@@ -42,29 +41,7 @@ bool ros_orocos_joints_gui_server::configureHook()
 
 bool ros_orocos_joints_gui_server::startHook()
 {
-    _joint_state_port.createStream(rtt_roscomm::topic("joint_states_desired"));
-    _joint_zero_port.createStream(rtt_roscomm::topic("joint_states_zeros"));
-
-    std::map<std::string, std::vector<std::string> >::iterator it;
-    for(it = _map_kin_chains_joints.begin(); it != _map_kin_chains_joints.end(); it++)
-    {
-        RTT::FlowStatus fs = _kinematic_chains_feedback_ports.at(it->first)->read(
-                    _kinematic_chains_joint_state_map.at(it->first));
-
-        for(unsigned int i = 0; i < it->second.size(); ++i){
-            int pos = find(_joint_state_msg.name.begin(), _joint_state_msg.name.end(),
-                           it->second[i]) - _joint_state_msg.name.begin();
-            _joint_state_msg.position[pos] =
-                    _kinematic_chains_joint_state_map.at(it->first).angles[i];
-            _joint_state_msg.velocity[pos] =
-                    _kinematic_chains_joint_state_map.at(it->first).velocities[i];
-            _joint_state_msg.effort[pos] =
-                    _kinematic_chains_joint_state_map.at(it->first).torques[i];
-        }
-    }
-
-    _joint_state_msg.header.stamp = rtt_rosclock::host_now();
-    _joint_zero_port.write(_joint_state_msg);
+    _joint_state_desired_port.createStream(rtt_roscomm::topic("joint_states_desired"));
 
     return true;
 }
