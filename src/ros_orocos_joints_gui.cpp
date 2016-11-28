@@ -43,7 +43,49 @@ bool ros_orocos_joints_gui_server::startHook()
 {
     _joint_state_desired_port.createStream(rtt_roscomm::topic("joint_states_desired"));
 
+
+    std::map<std::string, std::vector<std::string> >::iterator it;
+    for(it = _map_kin_chains_joints.begin(); it != _map_kin_chains_joints.end(); it++)
+    {
+        RTT::FlowStatus fs = _kinematic_chains_feedback_ports.at(it->first)->read(
+                    _kinematic_chains_joint_state_map.at(it->first));
+        for(unsigned int i = 0; i < it->second.size(); ++i)
+            _joint_trjs.push_back(joint_trj(it->second[i], 0.8,
+                                            _kinematic_chains_joint_state_map.at(it->first).angles[i],
+                                            _kinematic_chains_joint_state_map.at(it->first).angles[i]));
+    }
+
     return true;
+}
+
+void ros_orocos_joints_gui_server::updateHook()
+{
+    RTT::FlowStatus fs = _joint_state_desired_port.read(_joint_state_msg);
+    if(fs == 2)
+    {
+        for(unsigned int i = 0; i < _joint_state_msg.name.size(); ++i)
+        {
+            for(unsigned int j = 0; j < _joint_trjs.size(); ++j)
+            {
+                if(_joint_trjs[j].joint_name.compare(_joint_state_msg.name[i]) == 0)
+                    if(!_joint_trjs[j].run)
+                        _joint_trjs[j].qgoal = _joint_state_msg.position[i];
+            }
+        }
+    }
+    std::map<std::string, boost::shared_ptr<RTT::OutputPort<rstrt::kinematics::JointAngles> > >::iterator it;
+    for(it = _kinematic_chains_output_ports.begin(); it != _kinematic_chains_output_ports.end(); it++)
+    {
+        std::vector<std::string> joint_names = _map_kin_chains_joints.at(it->first);
+        for(unsigned int i = 0; i < joint_names.size(); ++i)
+        {
+            for(unsigned int j = 0; j < _joint_trjs.size(); ++j)
+                if(_joint_trjs[j].joint_name.compare(joint_names[i]) == 0)
+                    _kinematic_chains_desired_joint_state_map.at(it->first).angles[i] = _joint_trjs[j].trj(0.01);
+
+        }
+        _kinematic_chains_output_ports.at(it->first)->write(_kinematic_chains_desired_joint_state_map.at(it->first));
+    }
 }
 
 bool ros_orocos_joints_gui_server::attachToRobot(const std::string &robot_name)
@@ -69,16 +111,6 @@ bool ros_orocos_joints_gui_server::attachToRobot(const std::string &robot_name)
         std::string kin_chain_name = it->first;
         std::vector<std::string> joint_names = it->second;
 
-        _kinematic_chains_feedback_ports[kin_chain_name] =
-            boost::shared_ptr<RTT::InputPort<rstrt::robot::JointState> >(
-                        new RTT::InputPort<rstrt::robot::JointState>(
-                            kin_chain_name+"_"+"JointFeedback"));
-        this->addPort(*(_kinematic_chains_feedback_ports.at(kin_chain_name))).
-                doc(kin_chain_name+"_"+"JointFeedback port");
-
-        _kinematic_chains_feedback_ports.at(kin_chain_name)->connectTo(
-                    task_ptr->ports()->getPort(kin_chain_name+"_"+"JointFeedback"));
-
 
         _kinematic_chains_output_ports[kin_chain_name] =
                 boost::shared_ptr<RTT::OutputPort<rstrt::kinematics::JointAngles> >(
@@ -90,8 +122,24 @@ bool ros_orocos_joints_gui_server::attachToRobot(const std::string &robot_name)
                     task_ptr->ports()->getPort(kin_chain_name+"_"+"JointPositionCtrl"));
 
 
-        rstrt::robot::JointState tmp(joint_names.size());
-        _kinematic_chains_joint_state_map[kin_chain_name] = tmp;
+        rstrt::kinematics::JointAngles tmp(joint_names.size());
+        _kinematic_chains_desired_joint_state_map[kin_chain_name] = tmp;
+
+
+        _kinematic_chains_feedback_ports[kin_chain_name] =
+            boost::shared_ptr<RTT::InputPort<rstrt::robot::JointState> >(
+                        new RTT::InputPort<rstrt::robot::JointState>(
+                            kin_chain_name+"_"+"JointFeedback"));
+        this->addPort(*(_kinematic_chains_feedback_ports.at(kin_chain_name))).
+                doc(kin_chain_name+"_"+"JointFeedback port");
+
+        _kinematic_chains_feedback_ports.at(kin_chain_name)->connectTo(
+                    task_ptr->ports()->getPort(kin_chain_name+"_"+"JointFeedback"));
+
+        rstrt::robot::JointState tmp2(joint_names.size());
+        _kinematic_chains_joint_state_map[kin_chain_name] = tmp2;
+
+
         RTT::log(RTT::Info)<<"Added "<<kin_chain_name<<" port and data"<<RTT::endlog();
     }
 
