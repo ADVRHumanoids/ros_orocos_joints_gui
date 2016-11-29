@@ -1,4 +1,7 @@
 <launch>
+     <node name="pyros_topic_to_param" pkg="ros_orocos_joints_gui" type="pyros_topic_to_param.py" />
+
+
      <arg name="gui" default="true" />
 
      <!-- send the coman robot XML to param server -->
