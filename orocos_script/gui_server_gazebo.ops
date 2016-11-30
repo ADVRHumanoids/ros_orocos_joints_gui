@@ -28,15 +28,15 @@ gazebo.start()
 
 gazebo.toggleDynamicsSimulation(false)
 
-gazebo.spawn_model("coman", "model://iit-coman-no-forearms", 20)
+gazebo.spawn_model("coman", "model://iit-coman", 20)
 
 import("rtt-gazebo-robot-sim")
 
 loadComponent("coman","cogimon::robotSim")
 setActivity("coman",0,11,ORO_SCHED_OTHER)
 
-var string urdf_path = os.getenv("ROBOTOLOGY_ROOT") + "/robots/cogimon-gazebo-models/iit-coman-no-forearms/model.urdf"
-var string srdf_path = os.getenv("ROBOTOLOGY_ROOT") + "/robots/cogimon-gazebo-models/iit-coman-no-forearms/coman_no_forearms.srdf"
+var string urdf_path = os.getenv("ROBOTOLOGY_ROOT") + "/robots/cogimon-gazebo-models/iit-coman/model.urdf"
+var string srdf_path = os.getenv("ROBOTOLOGY_ROOT") + "/robots/cogimon-gazebo-models/iit-coman/coman.srdf"
 coman.loadURDFAndSRDF(urdf_path, srdf_path)
 coman.getModel("coman")
 coman.configure()
