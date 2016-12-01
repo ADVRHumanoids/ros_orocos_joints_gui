@@ -21,8 +21,8 @@ setActivity("coman",0.001,10,ORO_SCHED_OTHER)
 var string YAML_path = os.getenv("ROBOTOLOGY_ROOT") + "/robots/rtt_coman/config/config.yaml"
 coman.loadYAML(YAML_path)
 
-var string urdf_path = os.getenv("ROBOTOLOGY_ROOT") + "/robots/cogimon-gazebo-models/iit-coman-no-forearms/model.urdf"
-var string srdf_path = os.getenv("ROBOTOLOGY_ROOT") + "/robots/cogimon-gazebo-models/iit-coman-no-forearms/coman_no_forearms.srdf"
+var string urdf_path = os.getenv("ROBOTOLOGY_ROOT") + "/robots/cogimon-gazebo-models/iit-coman/model.urdf"
+var string srdf_path = os.getenv("ROBOTOLOGY_ROOT") + "/robots/cogimon-gazebo-models/iit-coman/coman.srdf"
 coman.loadURDFAndSRDF(urdf_path, srdf_path)
 
 coman.configure()
@@ -50,3 +50,5 @@ addPeer("gui_server", "coman")
 gui_server.attachToRobot("coman")
 gui_server.configure()
 gui_server.start()
+
+
