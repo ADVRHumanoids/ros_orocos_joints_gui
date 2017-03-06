@@ -15,8 +15,8 @@ setActivity("coman",0.001,10,ORO_SCHED_OTHER)
 var string YAML_path = os.getenv("ROBOTOLOGY_ROOT") + "/robots/rtt_coman/config/config.yaml"
 coman.loadYAML(YAML_path)
 
-var string urdf_path = os.getenv("ROBOTOLOGY_ROOT") + "/robots/cogimon-gazebo-models/iit-coman-hardware/model.urdf"
-var string srdf_path = os.getenv("ROBOTOLOGY_ROOT") + "/robots/cogimon-gazebo-models/iit-coman-hardware/coman.srdf"
+var string urdf_path = os.getenv("ROBOTOLOGY_ROOT") + "/robots/cogimon-gazebo-models/iit-coman/model.urdf"
+var string srdf_path = os.getenv("ROBOTOLOGY_ROOT") + "/robots/cogimon-gazebo-models/iit-coman/coman.srdf"
 coman.loadURDFAndSRDF(urdf_path, srdf_path)
 
 coman.configure()
@@ -35,6 +35,7 @@ coman.start()
 import("rtt_ros")
 import("rtt_rosnode")
 import("rtt_sensor_msgs")
+import("rtt_geometry_msgs")
 import("orocos_ros_joint_state_publisher")
 import("ros_orocos_joints_gui")
 
