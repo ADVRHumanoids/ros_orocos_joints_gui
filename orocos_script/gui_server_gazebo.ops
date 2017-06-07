@@ -7,20 +7,12 @@ import("rtt_rsbcomm")
 import("rtt_gazebo_embedded")
 require("os")
 
-## EXTRA FOR ROS
-import("rtt_ros")
-import("rtt_rosnode")
-import("rtt_sensor_msgs")
-import("orocos_ros_joint_state_publisher")
-import("ros_orocos_joints_gui")
-##
-
-
 loadComponent("gazebo","RTTGazeboEmbedded")
 
 setActivity("gazebo",0,10,ORO_SCHED_OTHER)
 
 gazebo.argv = strings("--verbose","-s /orocos/gnulinux/rtt_gazebo_system/librtt_gazebo_system.so")
+gazebo.add_plugin("/opt/ros/indigo/lib/libgazebo_ros_api_plugin.so");
 
 gazebo.configure()
 
@@ -41,7 +33,20 @@ coman.loadURDFAndSRDF(urdf_path, srdf_path)
 coman.getModel("coman")
 coman.configure()
 
+var array ref1 = array(0.3490658503988659, 0.17453292519943295, 0.0, -1.3962634015954636, 0.0, 0.0, 0.0)
+coman.setInitialPosition("left_arm", ref1)
+var array ref2 = array(0.3490658503988659, -0.17453292519943295, 0.0, -1.3962634015954636, 0.0, 0.0, 0.0)
+coman.setInitialPosition("right_arm", ref2)
+
 gazebo.toggleDynamicsSimulation(true)
+
+
+import("rtt_ros")
+import("rtt_rosnode")
+import("rtt_sensor_msgs")
+import("rtt_geometry_msgs")
+import("orocos_ros_joint_state_publisher")
+import("ros_orocos_joints_gui")
 
 ## OROCOS_ROS_JOINT_STATE_PUBLISHER
 loadComponent("coman_ros_joint_state_publisher","orocos_ros_joint_state_publisher")
