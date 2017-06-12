@@ -9,7 +9,7 @@
 ros_orocos_joints_gui_server::ros_orocos_joints_gui_server(std::string const & name):
     RTT::TaskContext(name)
 {
-    this->setActivity(new RTT::Activity(1, 0.01));
+    this->setActivity(new RTT::Activity(1, 0.001));
 
     this->addOperation("attachToRobot", &ros_orocos_joints_gui_server::attachToRobot,
                 this, RTT::ClientThread);
@@ -76,11 +76,10 @@ void ros_orocos_joints_gui_server::updateHook()
     std::map<std::string, boost::shared_ptr<RTT::OutputPort<rstrt::kinematics::JointAngles> > >::iterator it;
     for(it = _kinematic_chains_output_ports.begin(); it != _kinematic_chains_output_ports.end(); it++)
     {
-        std::vector<std::string> joint_names = _map_kin_chains_joints.at(it->first);
-        for(unsigned int i = 0; i < joint_names.size(); ++i)
+        for(unsigned int i = 0; i < _map_kin_chains_joints.at(it->first).size(); ++i)
         {
             for(unsigned int j = 0; j < _joint_trjs.size(); ++j)
-                if(_joint_trjs[j].joint_name.compare(joint_names[i]) == 0)
+                if(_joint_trjs[j].joint_name.compare(_map_kin_chains_joints.at(it->first)[i]) == 0)
                     _kinematic_chains_desired_joint_state_map.at(it->first).angles[i] = _joint_trjs[j].trj(0.01);
 
         }
