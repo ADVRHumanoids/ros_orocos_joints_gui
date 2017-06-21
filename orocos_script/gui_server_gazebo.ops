@@ -20,15 +20,15 @@ gazebo.start()
 
 gazebo.toggleDynamicsSimulation(false)
 
-gazebo.spawn_model("coman", "model://iit-coman", 20)
+gazebo.spawn_model("coman", "model://iit-coman-xtion", 20)
 
 import("rtt-gazebo-robot-sim")
 
 loadComponent("coman","cogimon::robotSim")
 setActivity("coman",0,11,ORO_SCHED_OTHER)
 
-var string urdf_path = os.getenv("ROBOTOLOGY_ROOT") + "/robots/cogimon-gazebo-models/iit-coman/model.urdf"
-var string srdf_path = os.getenv("ROBOTOLOGY_ROOT") + "/robots/cogimon-gazebo-models/iit-coman/coman.srdf"
+var string urdf_path = os.getenv("ROBOTOLOGY_ROOT") + "/robots/cogimon-gazebo-models/iit-coman-xtion/model.urdf"
+var string srdf_path = os.getenv("ROBOTOLOGY_ROOT") + "/robots/cogimon-gazebo-models/iit-coman-xtion/coman.srdf"
 coman.loadURDFAndSRDF(urdf_path, srdf_path)
 coman.getModel("coman")
 coman.configure()
@@ -37,6 +37,9 @@ var array ref1 = array(0.3490658503988659, 0.17453292519943295, 0.0, -1.39626340
 coman.setInitialPosition("left_arm", ref1)
 var array ref2 = array(0.3490658503988659, -0.17453292519943295, 0.0, -1.3962634015954636, 0.0, 0.0, 0.0)
 coman.setInitialPosition("right_arm", ref2)
+var array ref3 = array(-0.4363, 0.0, 0.0, 0.8726, 0.0, -0.4363)
+coman.setInitialPosition("left_leg", ref3)
+coman.setInitialPosition("right_leg", ref3)
 
 gazebo.toggleDynamicsSimulation(true)
 
